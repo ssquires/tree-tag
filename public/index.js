@@ -155,7 +155,6 @@ function initializeMap() {
        title: 'tree'
     });
     map.addListener('click', function(event) {
-        console.log(event.latLng);
         currLatLng = event.latLng;
         updatePanos();
         marker.setMap(null);
@@ -252,7 +251,5 @@ function getJsonFromUrl() {
     var item = part.split("=");
     result[item[0]] = decodeURIComponent(item[1]);
   });
-    console.log(location);
-    console.log(result);
   return result;
 }
