@@ -139,8 +139,8 @@ function initializeMap() {
         zoom: 20,
         mapTypeId: google.maps.MapTypeId.HYBRID,
         disableDefaultUI: true,
-        draggable: false,
-        scrollwheel: false
+//        draggable: false,
+//        scrollwheel: false
     });
     var windowContent = "<button id='accept_tree_button' onclick='acceptTree();'>Add Tree</button>";
     infoWindow.close();
@@ -154,6 +154,7 @@ function initializeMap() {
        title: 'tree'
     });
     map.addListener('click', function(event) {
+        console.log(event.latLng);
         currLatLng = event.latLng;
         updatePanos();
         marker.setMap(null);
