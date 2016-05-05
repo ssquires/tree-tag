@@ -251,7 +251,7 @@ function getJsonFromUrl() {
     var item = part.split("=");
     result[item[0]] = decodeURIComponent(item[1]);
   });
-    console.log('location');
+    console.log(location);
     console.log(result);
   return result;
 }
