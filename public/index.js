@@ -127,7 +127,6 @@ function updatePanos() {
         panoPolyLines.push(polyLine);
         var heading = google.maps.geometry.spherical.computeHeading(
             panoLatLng, currLatLng);
-        //panorama.setPosition(panoLatLng);
         panorama.setPov({heading: heading,
                          pitch: 0});
         panos.push(panorama);
@@ -140,8 +139,8 @@ function initializeMap() {
         zoom: 20,
         mapTypeId: google.maps.MapTypeId.HYBRID,
         disableDefaultUI: true,
-        //draggable: false,
-        //scrollwheel: false
+        draggable: false,
+        scrollwheel: false
     });
     var windowContent = "<button id='accept_tree_button' onclick='acceptTree();'>Add Tree</button>";
     infoWindow.close();
