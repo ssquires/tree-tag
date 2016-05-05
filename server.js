@@ -26,48 +26,4 @@ app.get('/panodata', function(req, res) {
     
 });
 
-app.post('/submittree', jsonParser, function(request, response) {
-    console.log(request.body);
-    mongoClient.connect(dbUrl, function(err, db) {
-        if (!err) {
-            console.log('connected to database.');
-        } else {
-            console.log('error connecting to database.');
-        }
-        
-        db.collection('trees').insertOne(request.body,
-                                         function(err, result) {
-            if (!err) {
-                console.log('added new tree to database.');
-            } else {
-                console.log('error adding tree: ' + err);
-            }
-        });
-    });
-});
-
-app.post('/gettrees', jsonParser, function(request, response) {
-    console.log(request.body);
-    mongoClient.connect(dbUrl, function(err, db) {
-        if (!err) {
-            console.log('connected to database.');
-        } else {
-            console.log('error connecting to database. ' + err);
-            return;
-        }
-        
-        var treesToDisplay = [];
-        
-        var records = db.collection('trees').find();
-        records.each(function(err, doc) {
-            if (doc) {
-                treesToDisplay.push({lat: doc['lat'], lng: doc['lng']});
-            } else {
-                console.log(treesToDisplay);
-                response.json(treesToDisplay);
-            }
-        });
-    });
-})
-
 app.listen(8080);
