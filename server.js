@@ -6,6 +6,8 @@ var app = express();
 app.use(express.static('public'));
 app.use('/jquery', express.static(__dirname + '/jquery-ui-1.11.4.custom'));
 
+var port = process.env.PORT || 8080;
+
 var jsonParser = bodyParser.json();
 
 app.get('/', function(request, response) {
@@ -26,4 +28,4 @@ app.get('/panodata', function(req, res) {
     
 });
 
-app.listen(8080);
+app.listen(port);
