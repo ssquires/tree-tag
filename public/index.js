@@ -18,10 +18,15 @@ var infoWindow;
 var cancelTreeWindow;
 
 function initialize() {
+    var urlParams = getJsonFromUrl();
+    var lat = parseFloat(urlParams.lat);
+    var lng = parseFloat(urlParams.lng);
+    var panoImageRegion = urlParams.region;
+    
     panosUrl = '/panodata';
-    panoImagePrefix = 'http://131.215.134.227/los_angeles/streetview/ROI874/';
+    panoImagePrefix = 'http://131.215.134.227/los_angeles/streetview/' + panoImageRegion + '/';
     panoImageSuffix = '_z2.jpg';
-    mapCenterLatLng = new google.maps.LatLng(34.070847, -118.301661);
+    mapCenterLatLng = new google.maps.LatLng(lat, lng);
     currLatLng = mapCenterLatLng;
     panos = [];
     panoPolyLines = [];
@@ -132,7 +137,7 @@ function updatePanos() {
 function initializeMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: mapCenterLatLng,
-        zoom: 25,
+        zoom: 18,
         mapTypeId: google.maps.MapTypeId.HYBRID,
         disableDefaultUI: true,
         //draggable: false,
@@ -237,4 +242,14 @@ function submitAllTrees() {
     for (var i = 0; i < acceptedTrees.length; i++) {
         console.log("submitting tree at " + acceptedTrees[i].lat + ", " + acceptedTrees[i].lng);
     }
+}
+
+function getJsonFromUrl() {
+  var query = location.search.substr(1);
+  var result = {};
+  query.split("&").forEach(function(part) {
+    var item = part.split("=");
+    result[item[0]] = decodeURIComponent(item[1]);
+  });
+  return result;
 }
