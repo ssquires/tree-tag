@@ -137,7 +137,7 @@ function updatePanos() {
 function initializeMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: mapCenterLatLng,
-        zoom: 18,
+        zoom: 20,
         mapTypeId: google.maps.MapTypeId.HYBRID,
         disableDefaultUI: true,
         //draggable: false,
