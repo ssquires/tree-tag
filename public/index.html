@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>Select Trees</title>
+      <meta name="viewport" content="initial-scale=1.0">  
+      <meta charset="utf-8">
+      <link rel="stylesheet" href="/jquery/jquery-ui.min.css">
+      <link rel="stylesheet" type="text/css" href="index.css">
+      <script src="/jquery/external/jquery/jquery.js"></script>
+      <script src="/jquery/jquery-ui.min.js"></script>
+      <script src="index.js"></script>
+  </head>
+  <body>
+    <div id="map_and_streetview_container">
+        <div id="map_container">
+            <div id="map"></div>
+        </div>
+        <div id="streetview_maps">
+            <div id="first_two_panos">
+                <div class="pano_container" id="pano_1_container">
+                    <div id="pano_1" class="streetview"></div>
+                </div>
+                <div class="pano_container" id="pano_2_container">
+                    <div id="pano_2" class="streetview"></div>
+                </div>
+            </div>
+            <div id="second_two_panos">
+                <div class="pano_container" id="pano_3_container">
+                    <div id="pano_3" class="streetview"></div>
+                </div>
+                <div class="pano_container" id="pano_4_container">
+                    <div id="pano_4" class="streetview"></div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <button onClick="submitAllTrees();" id="submit_all_trees_button" style="display:block">Submit All Trees</button>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVaXLLe74QmHG1ZvQzplX0oFm0qgu3mgE&libraries=geometry&callback=initialize"
+    async defer></script>
+  </body>
+</html>
