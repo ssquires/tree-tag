@@ -16,12 +16,13 @@ var acceptedTrees;
 var acceptedTreeMarkers;
 var infoWindow;
 var cancelTreeWindow;
+var panoImageRegion;
 
 function initialize() {
     var urlParams = getJsonFromUrl();
     var lat = parseFloat(urlParams.lat);
     var lng = parseFloat(urlParams.lng);
-    var panoImageRegion = urlParams.region;
+    panoImageRegion = urlParams.region;
     
     panosUrl = '/panodata';
     panoImagePrefix = 'http://131.215.134.227/los_angeles/streetview/' + panoImageRegion + '/';
@@ -81,7 +82,7 @@ function initializePanos() {
     // Load panos json
     var xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
-    xobj.open('GET', panosUrl, true); 
+    xobj.open('GET', panosUrl + '/' + '?region=' + panoImageRegion, true); 
     xobj.onreadystatechange = function () {
         if (xobj.readyState == 4 && xobj.status == "200") {
             allPanosData = JSON.parse(xobj.responseText);

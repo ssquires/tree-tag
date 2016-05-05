@@ -14,8 +14,9 @@ app.get('/', function(request, response) {
    response.render('index.html'); 
 });
 
-app.get('/panodata', function(req, res) {
-    panoUrl = 'http://131.215.134.227/los_angeles/streetview/ROI874.json';
+app.get('/panodata/', function(req, res) {
+    panoUrl = 'http://131.215.134.227/los_angeles/streetview/' + req.query.region + '.json';
+    console.log(req.query);
     request({
         url: panoUrl,
         json: true
