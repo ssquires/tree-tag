@@ -40,7 +40,7 @@ body {
 }
 
 #map_and_streetview_container {
-    padding-top: 100px;
+    padding-top: 20px;
     width: 100%;
     display: flex;
     justify-content: space-around;
