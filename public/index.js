@@ -37,12 +37,9 @@ function initialize() {
     infoWindow = new google.maps.InfoWindow({
             content: ''
         });
-    panoColors = ['#FF8282', '#C1FF82', '#82FFFF', '#C182FF'];
+    panoColors = ['#FF8282'];
     panoDivs = [
-        document.getElementById('pano_1'),
-        document.getElementById('pano_2'),
-        document.getElementById('pano_3'),
-        document.getElementById('pano_4')
+        document.getElementById('pano_1')
     ];
     for (var i = 0; i < panoDivs.length; i++) {
         panoDivs[i].style.border = '3px solid' + panoColors[i];
@@ -97,7 +94,7 @@ function initializePanos() {
 }
 
 function updatePanos() {
-    closestPanosData = getNearestPanos(currLatLng.lat(), currLatLng.lng(), 4);
+    closestPanosData = getNearestPanos(currLatLng.lat(), currLatLng.lng(), 1);
     panos = [];
     for (var i = 0; i < panoPolyLines.length; i++) {
         panoPolyLines[i].setMap(null);
@@ -138,6 +135,7 @@ function initializeMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: mapCenterLatLng,
         zoom: 20,
+        tilt: 0,
         mapTypeId: google.maps.MapTypeId.HYBRID,
         disableDefaultUI: true,
 //        draggable: false,
