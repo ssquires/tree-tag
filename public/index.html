@@ -21,7 +21,15 @@
             </div>
         </div>
     </div>
-    <button onClick="submitAllTrees();" id="submit_all_trees_button" style="display:block">Submit All Trees</button>
+    <form id="form" action="https://workersandbox.mturk.com/mturk/externalSubmit"
+          method="POST">
+        <input type="submit" id="submit_all_trees_button" value="Submit All Trees"
+               style="display:block"/>
+        <input type="hidden" name="assignment_id" id="assignment_id" value="" />
+        <input type="hidden" name="tree_locations" id="tree_locations" value="" />
+
+    </form>
+    
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVaXLLe74QmHG1ZvQzplX0oFm0qgu3mgE&libraries=geometry&callback=initialize"
     async defer></script>
   </body>

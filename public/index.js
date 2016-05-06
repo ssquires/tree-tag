@@ -22,6 +22,9 @@ function initialize() {
     var urlParams = getJsonFromUrl();
     var lat = parseFloat(urlParams.lat);
     var lng = parseFloat(urlParams.lng);
+    var assignmentId = urlParams.assignmentId;
+    $('#assignment_id').val(assignmentId);
+    
     panoImageRegion = urlParams.region;
     
     panosUrl = '/panodata';
@@ -233,13 +236,27 @@ function acceptTree() {
         lat: marker.getPosition().lat(),
         lng: marker.getPosition().lng(),
     });
+    $('<input>').attr({
+        type: 'hidden',
+        name: 'trees[]',
+        value: marker.getPosition().lat() + ',' + marker.getPosition().lng()
+    }).appendTo('#form');
     marker.setMap(null);
 }
 
 function submitAllTrees() {
-    for (var i = 0; i < acceptedTrees.length; i++) {
-        console.log("submitting tree at " + acceptedTrees[i].lat + ", " + acceptedTrees[i].lng);
-    }
+//    for (var i = 0; i < acceptedTrees.length; i++) {
+//        console.log("submitting tree at " + acceptedTrees[i].lat + ", " + acceptedTrees[i].lng);
+//    }
+    var jsonData = {};
+    jsonData['trees'] = acceptedTrees;
+    
+    $.ajax({
+        url: 'https://workersandbox.mturk.com/mturk/externalSubmit',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(jsonData)
+    });
 }
 
 function getJsonFromUrl() {
@@ -251,3 +268,4 @@ function getJsonFromUrl() {
   });
   return result;
 }
+
