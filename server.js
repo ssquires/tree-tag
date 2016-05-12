@@ -28,4 +28,10 @@ app.get('/panodata/', function(req, res) {
     
 });
 
+app.post('/submittree', jsonParser, function(req, res) {
+    console.log(req.body);
+    
+});
+
+
 app.listen(port);

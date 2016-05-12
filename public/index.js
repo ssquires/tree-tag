@@ -47,6 +47,16 @@ function initialize() {
     for (var i = 0; i < panoDivs.length; i++) {
         panoDivs[i].style.border = '3px solid' + panoColors[i];
     }
+    
+    $("#directions_button").click(function() {
+        if ($(this).html() == "Directions (hide)") {
+            $(this).html("Directions (show)");
+        } else {
+            $(this).html("Directions (hide)");
+        }
+        $("#directions_box").slideToggle();
+    });
+    
     acceptedTrees = [];
     acceptedTreeMarkers = [];
     initializeMap();
