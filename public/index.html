@@ -13,58 +13,42 @@
   <body>
     <div id="directions_container">
         <div id="directions_bar">
-            <div id="directions_button">Directions (hide)</div>
+            <div id="directions_button"><h3>Directions (hide)</h3></div>
         </div>
         <div id="directions_box">
-            <p>In the satellite-view image below,  <strong>click on every tree you see that is right next to a street.</strong> 
-            </p>
+            <h3>In the satellite-view image below, click on every tree that is <strong>next to a street</strong> (within a few yards).</h3>
             <p>
-            If there are no streets in the satellite image, or if you don't see any trees right next to a street, you may submit this HIT without marking any trees.
+            If there are no streets shown in the satellite image, or no trees that are next to a street, you may submit without marking any trees.
             </p>
             <p>
             If you're not sure from the satellite view if something is a tree or not, click on it and look at the Street View panel. This should show you what the location you just clicked looks like from the street.
             </p>
             <p>
-                <strong>To mark a tree:</strong>
-            </p>
-            <p style="text-indent: 50px;">
-                    1. Left-click on the middle of the tree you see in the satellite image. A red map marker will appear.
-            </p>
-            <p style="text-indent: 50px;">
-                
-                    2. Click the "Add Tree" button you see in the window that pops up. A tree icon will appear.
+                <strong>Click the satellite image to mark a tree.</strong>
             </p>
             <p>
-                <strong>To remove a marker:</strong>
-            </p>
-            <p style="text-indent: 50px;">
-                1. Left-click on the tree icon of the tree you would like to remove.
-            </p>
-            <p style="text-indent: 50px;">
-                2. Click the "Remove" button you see in the window that pops up. The tree icon will disappear.
+                <strong>Click on an existing tree marker to remove it.</strong>
             </p>
             <p>
-                <strong>To submit this HIT:</strong>
+                Use the "Submit HIT" button at the bottom of the page when you're done.
             </p>
-            <p style="text-indent: 50px;">
-                    When you are done marking trees, click the "Submit All Trees" button at the bottom of the page to submit the HIT.
-            </p>
-            
         </div>
     </div>
     <div id="map_and_streetview_container">
         <div id="map_container">
+            <p>In the image below, click on all trees that are next to a street:</p>
             <div id="map"></div>
         </div>
         <div id="streetview_maps">
             <div class="pano_container" id="pano_1_container">
+                <p>The image below will show a street view of the location you clicked.</p>
                 <div id="pano_1" class="streetview"></div>
             </div>
         </div>
     </div>
     <form id="form" action="https://workersandbox.mturk.com/mturk/externalSubmit"
           method="POST">
-        <input type="submit" id="submit_all_trees_button" value="Submit All Trees"
+        <input type="submit" id="submit_all_trees_button" value="Submit HIT"
                style="display:block"/>
         <input type="hidden" name="assignmentId" id="assignment_id" value="" />
 

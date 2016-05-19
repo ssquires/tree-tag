@@ -12,11 +12,10 @@ var currLatLng;
 var panoPolyLines;
 var panoColors;
 var marker;
-var acceptedTrees;
 var acceptedTreeMarkers;
-var infoWindow;
-var cancelTreeWindow;
+var acceptedTreeInputs;
 var panoImageRegion;
+var treeNumber;
 
 function initialize() {
     var urlParams = getJsonFromUrl();
@@ -34,12 +33,6 @@ function initialize() {
     currLatLng = mapCenterLatLng;
     panos = [];
     panoPolyLines = [];
-    cancelTreeWindow = new google.maps.InfoWindow({
-            content: ''
-        });
-    infoWindow = new google.maps.InfoWindow({
-            content: ''
-        });
     panoColors = ['#FF8282'];
     panoDivs = [
         document.getElementById('pano_1')
@@ -49,16 +42,16 @@ function initialize() {
     }
     
     $("#directions_button").click(function() {
-        if ($(this).html() == "Directions (hide)") {
-            $(this).html("Directions (show)");
+        if ($(this).html() == "<h3>Directions (hide)</h3>") {
+            $(this).html("<h3>Directions (show)</h3>");
         } else {
-            $(this).html("Directions (hide)");
+            $(this).html("<h3>Directions (hide)</h3>");
         }
         $("#directions_box").slideToggle();
     });
     
-    acceptedTrees = [];
     acceptedTreeMarkers = [];
+    acceptedTreeInputs = [];
     initializeMap();
     initializePanos();
 }
@@ -154,37 +147,44 @@ function initializeMap() {
         draggable: false,
         scrollwheel: false
     });
-    var windowContent = "<button id='accept_tree_button' onclick='acceptTree();'>Add Tree</button>";
-    infoWindow.close();
-    infoWindow = new google.maps.InfoWindow({
-        content: windowContent,
-        disableAutoPan: true
-    });
-    marker = new google.maps.Marker({
-       position: currLatLng,
-       map: map,
-       title: 'tree'
-    });
     map.addListener('click', function(event) {
         currLatLng = event.latLng;
         updatePanos();
-        marker.setMap(null);
-        var markerOptions = {
-           position: event.latLng,
+        addTree(event.latLng);
+    });
+}
+
+function addTree(latLng) {
+    marker = new google.maps.Marker({
+           position: latLng,
            map: map,
            title: 'tree',
-           draggable: true
-        };
-        marker = new google.maps.Marker(markerOptions);
-        marker.addListener('drag', function(event) {
-            currLatLng = event.latLng;
-            panPanos(event.latLng);
-        });
-        marker.addListener('dragend', function(event) {
-            infoWindow.open(map, marker);
-        })
-        infoWindow.open(map, marker);
+           draggable: false,
+           icon: 'tree-icon.png'
     });
+    acceptedTreeMarkers.push(marker);
+    var acceptedTreeMarker = marker;
+    acceptedTreeMarker.addListener('click', function(event) {
+        var index = acceptedTreeMarkers.indexOf(acceptedTreeMarker);
+        acceptedTreeMarkers.splice(index, 1);
+        acceptedTreeInputs[index].remove();
+        acceptedTreeInputs.splice(index, 1);
+        acceptedTreeMarker.setMap(null);
+    });
+    acceptedTreeMarker.addListener('drag', function(event) {
+        currLatLng = event.latLng;
+        panPanos(event.latLng);
+        var index = acceptedTreeMarkers.indexOf(acceptedTreeMarker);
+        
+    });
+    var input = $('<input>').attr({
+        type: 'hidden',
+        name: 'trees[]',
+        id: treeNumber,
+        value: latLng.lat() + ',' + latLng.lng()
+    });
+    input.appendTo('#form');
+    acceptedTreeInputs.push(input);
 }
 
 function panPanos(newLatLng) {
@@ -214,59 +214,6 @@ function getNearestPanos(lat, lng, num_panos) {
     for(var i = 0; i < dists.length && i < num_panos; i++) 
         retval.push(dists[i].pano);
     return retval;
-}
-
-function acceptTree() {
-    infoWindow.close();
-    var acceptedTreeMarker = new google.maps.Marker({
-           position: marker.getPosition(),
-           map: map,
-           title: 'tree',
-           draggable: false,
-           icon: 'tree-icon.png'
-    });
-    acceptedTreeMarker.addListener('click', function(event) {
-        var windowContent = "<button id='remove_tree_button'>Remove</button>";
-        cancelTreeWindow.close();
-        cancelTreeWindow = new google.maps.InfoWindow({
-            content: windowContent,
-            disableAutoPan: true
-        });
-        cancelTreeWindow.open(map, acceptedTreeMarker);
-        $('#remove_tree_button').click(function() {
-            var index = acceptedTreeMarkers.indexOf(acceptedTreeMarker);
-            acceptedTreeMarkers.splice(index, 1);
-            acceptedTrees.splice(index, 1);
-            acceptedTreeMarker.setMap(null);
-            cancelTreeWindow.close();
-        });
-    });
-    acceptedTreeMarkers.push(acceptedTreeMarker);
-    acceptedTrees.push({
-        lat: marker.getPosition().lat(),
-        lng: marker.getPosition().lng(),
-    });
-    $('<input>').attr({
-        type: 'hidden',
-        name: 'trees[]',
-        value: marker.getPosition().lat() + ',' + marker.getPosition().lng()
-    }).appendTo('#form');
-    marker.setMap(null);
-}
-
-function submitAllTrees() {
-//    for (var i = 0; i < acceptedTrees.length; i++) {
-//        console.log("submitting tree at " + acceptedTrees[i].lat + ", " + acceptedTrees[i].lng);
-//    }
-    var jsonData = {};
-    jsonData['trees'] = acceptedTrees;
-    
-    $.ajax({
-        url: 'https://workersandbox.mturk.com/mturk/externalSubmit',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(jsonData)
-    });
 }
 
 function getJsonFromUrl() {
