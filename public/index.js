@@ -22,6 +22,7 @@ function initialize() {
     var lat = parseFloat(urlParams.lat);
     var lng = parseFloat(urlParams.lng);
     var assignmentId = urlParams.assignmentId;
+    console.log(assignmentId);
     $('#assignment_id').val(assignmentId);
     
     panoImageRegion = urlParams.region;
