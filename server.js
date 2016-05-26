@@ -15,7 +15,8 @@ app.get('/', function(request, response) {
 });
 
 app.get('/panodata/', function(req, res) {
-    panoUrl = 'http://131.215.134.227/los_angeles/streetview/' + req.query.region + '.json';
+//    panoUrl = 'http://131.215.134.227/los_angeles/streetview/' + req.query.region + '.json';
+    panoUrl = 'http://sbranson.no-ip.org/pasadena_panos/' + req.query.region + '.json';
     request({
         url: panoUrl,
         json: true
