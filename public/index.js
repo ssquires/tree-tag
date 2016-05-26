@@ -27,7 +27,8 @@ function initialize() {
     panoImageRegion = urlParams.region;
     
     panosUrl = '/panodata';
-    panoImagePrefix = 'http://131.215.134.227/los_angeles/streetview/' + panoImageRegion + '/';
+//    panoImagePrefix = 'http://131.215.134.227/los_angeles/streetview/' + panoImageRegion + '/';
+    panoImagePrefix = 'http://sbranson.no-ip.org/pasadena_panos/' + panoImageRegion + '/';
     panoImageSuffix = '_z2.jpg';
     mapCenterLatLng = new google.maps.LatLng(lat, lng);
     currLatLng = mapCenterLatLng;
