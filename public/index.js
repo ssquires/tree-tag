@@ -186,9 +186,9 @@ function addTree(latLng) {
 
 
 /*
- *  Saves annotated tree coordinates in (lat, lng) pairs as a CSV
+ *  Saves annotated tree coordinates in (lat, lng) pairs as a JSON file.
  */
-function saveTreesToCSV() {
+function saveTreesToJSONFile() {
     allTreeCoords = [];
     for (var marker in acceptedTreeMarkers) {
         allTreeCoords[marker] = acceptedTreeMarkers[marker].getPosition();
