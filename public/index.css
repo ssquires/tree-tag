@@ -17,8 +17,8 @@ body {
 
 .pano_container {
     position: relative;
-    width: 494px;
-    height: 494px;
+    width: 500px;
+    height: 500px;
 }
 
 #map {

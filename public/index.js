@@ -1,46 +1,32 @@
 
-var panosUrl;
-var panoImagePrefix;
-var panoImageSuffix;
 var closestPanosData;
 var allPanosData;
-var mapCenterLatLng;
+
 var panorama;
 var map;
-var panos;
-var currLatLng;
-var panoPolyLines;
-var panoColors;
-var marker;
-var acceptedTreeMarkers;
-var acceptedTreeInputs;
-var panoImageRegion;
-var treeNumber;
 
+var currPano;
+var currLatLng;
+var currPolyLine;
+var currTreeMarker;
+
+var acceptedTreeMarkers = [];
+var treeNumber;
+var panoImageRegion;
+
+
+/*
+ *  Initial setup.
+ */
 function initialize() {
     var urlParams = getJsonFromUrl();
     var lat = parseFloat(urlParams.lat);
     var lng = parseFloat(urlParams.lng);
-    var assignmentId = urlParams.assignmentId;
-    $('#assignment_id').val(assignmentId);
-    
     panoImageRegion = urlParams.region;
     
-    panosUrl = '/panodata';
-//    panoImagePrefix = 'http://131.215.134.227/los_angeles/streetview/' + panoImageRegion + '/';
-    panoImagePrefix = 'http://sbranson.no-ip.org/pasadena_panos/' + panoImageRegion + '/';
-    panoImageSuffix = '_z2.jpg';
-    mapCenterLatLng = new google.maps.LatLng(lat, lng);
-    currLatLng = mapCenterLatLng;
-    panos = [];
-    panoPolyLines = [];
-    panoColors = ['#FF8282'];
-    panoDivs = [
-        document.getElementById('pano_1')
-    ];
-    for (var i = 0; i < panoDivs.length; i++) {
-        panoDivs[i].style.border = '3px solid' + panoColors[i];
-    }
+    currLatLng = new google.maps.LatLng(lat, lng);
+    initializeMap(currLatLng);
+    initializePano(panoImageRegion);
     
     $("#directions_button").click(function() {
         if ($(this).html() == "<h3>Directions (hide)</h3>") {
@@ -50,28 +36,53 @@ function initialize() {
         }
         $("#directions_box").slideToggle();
     });
-    
-    acceptedTreeMarkers = [];
-    acceptedTreeInputs = [];
-    initializeMap();
-    initializePanos();
 }
 
+
+/*
+ *  Initializes the map.
+ */
+function initializeMap(latLng) {
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: latLng,
+        zoom: 20,
+        tilt: 0,
+        mapTypeId: google.maps.MapTypeId.HYBRID,
+        disableDefaultUI: true,
+        draggable: false,
+        scrollwheel: false
+    });
+    map.addListener("click", function(event) {
+        currLatLng = event.latLng;
+        updatePano();
+        addTree(event.latLng);
+    });
+}
+
+
+/*
+ *  Returns the url of the appropriate pano image.
+ */
 function getPanoImgSrc(pano, zoom, tileX, tileY) {
-    var panoramaImageSrc = panoImagePrefix+closestPanosData[parseInt(pano)].Location.panoId+panoImageSuffix;
+    var panoImagePrefix = "http://sbranson.no-ip.org/pasadena_panos/" + panoImageRegion + "/";
+    var panoImageSuffix = "_z2.jpg";
+    var panoramaImageSrc = panoImagePrefix + closestPanosData[0].Location.panoId + panoImageSuffix;
     return panoramaImageSrc;
 }
 
-// Construct StreetViewPanoramaData for the given pano.
+
+/*
+ *  Builds a Street View panorama.
+ */
 function getPanorama(pano, zoom, tileX, tileY) {
     return {
       location: {
         pano: pano,
-        description: 'pano',
+        description: "pano",
       },
       links: [],
       // The text for the copyright control.
-      copyright: 'Imagery (c) 2010 Google',
+      copyright: "Imagery (c) 2010 Google",
       // The definition of the tiles for this panorama.
       tiles: {
         tileSize: new google.maps.Size(512, 512),
@@ -82,127 +93,135 @@ function getPanorama(pano, zoom, tileX, tileY) {
     };
 }
 
-function initializePanos() {
-    // Load panos json
+
+/*
+ *  Loads all panorama data for the given region.
+ */
+function initializePano(panoImageRegion) {
     var xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
-    xobj.open('GET', panosUrl + '/' + '?region=' + panoImageRegion, true); 
+    xobj.open("GET", "/panodata/" + "?region=" + panoImageRegion, true); 
     xobj.onreadystatechange = function () {
         if (xobj.readyState == 4 && xobj.status == "200") {
             allPanosData = JSON.parse(xobj.responseText);
             for(var i in allPanosData) {
-                allPanosData[i].lat = parseFloat(allPanosData[i]['Location']['original_lat']);
-                allPanosData[i].lng = parseFloat(allPanosData[i]['Location']['original_lng']);
+                allPanosData[i].lat = parseFloat(allPanosData[i]["Location"]["original_lat"]);
+                allPanosData[i].lng = parseFloat(allPanosData[i]["Location"]["original_lng"]);
             }
-            updatePanos();
+            updatePano();
         }
       };
-      xobj.send(null); 
+    xobj.send(null); 
 }
 
-function updatePanos() {
+
+/*
+ *  Updates the panorama displayed with the pano image closest to the given coordinates.
+ */
+function updatePano() {
     closestPanosData = getNearestPanos(currLatLng.lat(), currLatLng.lng(), 1);
-    panos = [];
-    for (var i = 0; i < panoPolyLines.length; i++) {
-        panoPolyLines[i].setMap(null);
-    }
-    panoPolyLines = [];
-    
-    for (var i = 0; i < closestPanosData.length; i++) {
-        panorama = new google.maps.StreetViewPanorama(
-            panoDivs[i], {
-            pano: i.toString(),
-            visible: true,
-            panoProvider: getPanorama,
-            disableDefaultUI: true,
-            map: map
-        });
-        panorama.setZoom(1);
-        var panoLatLng = new google.maps.LatLng(closestPanosData[i].lat, 
-                                                closestPanosData[i].lng);
-        
-        var polyLine = new google.maps.Polyline({
-            path: [panoLatLng, currLatLng],
-            geodesic: true,
-            strokeColor: panoColors[i],
-            strokeOpacity: 1.0,
-            strokeWeight: 2,
-            map: map
-        });
-        panoPolyLines.push(polyLine);
-        var heading = google.maps.geometry.spherical.computeHeading(
-            panoLatLng, currLatLng);
-        panorama.setPov({heading: heading,
-                         pitch: 0});
-        panos.push(panorama);
-    }
-}
-
-function initializeMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: mapCenterLatLng,
-        zoom: 20,
-        tilt: 0,
-        mapTypeId: google.maps.MapTypeId.HYBRID,
+    currPano = new google.maps.StreetViewPanorama(document.getElementById("pano_1"), {
+        pano: "0",
+        visible: true,
+        panoProvider: getPanorama,
         disableDefaultUI: true,
-        draggable: false,
-        scrollwheel: false
+        map: map,
+        zoom: 1
     });
-    map.addListener('click', function(event) {
-        currLatLng = event.latLng;
-        updatePanos();
-        addTree(event.latLng);
+    
+    var panoLatLng = new google.maps.LatLng(closestPanosData[0].lat, 
+                                            closestPanosData[0].lng);
+    var heading = google.maps.geometry.spherical.computeHeading(
+            panoLatLng, currLatLng);
+    
+    currPano.setPov({heading: heading,
+                     pitch: 0});
+    
+    updatePolyline(panoLatLng.lat(), panoLatLng.lng(), currLatLng.lat(), currLatLng.lng());
+}
+
+
+/*
+ *  Displays a polyline on the map from the panorama's position to the current point's position.
+ */
+function updatePolyline(panoLat, panoLng, pointLat, pointLng) {
+    if (currPolyLine) {
+        currPolyLine.setMap(null);
+    }
+    currPolyLine = new google.maps.Polyline({
+        path: [{lat: panoLat, lng: panoLng}, {lat: pointLat, lng: pointLng}],
+        geodesic: true,
+        strokeColor: "#FF0000",
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+        map: map
     });
 }
 
+
+/*
+ *  Adds a tree marker to the map and keeps track of the new tree's coordinates.
+ */
 function addTree(latLng) {
-    marker = new google.maps.Marker({
+    currTreeMarker = new google.maps.Marker({
            position: latLng,
            map: map,
-           title: 'tree',
-           draggable: false,
-           icon: 'tree-icon.png'
+           title: "tree",
+           draggable: true,
+           icon: "tree-icon.png"
     });
-    acceptedTreeMarkers.push(marker);
-    var acceptedTreeMarker = marker;
-    acceptedTreeMarker.addListener('click', function(event) {
+    acceptedTreeMarkers.push(currTreeMarker);
+    var acceptedTreeMarker = currTreeMarker;
+    acceptedTreeMarker.addListener("click", function(event) {
         var index = acceptedTreeMarkers.indexOf(acceptedTreeMarker);
         acceptedTreeMarkers.splice(index, 1);
-        acceptedTreeInputs[index].remove();
-        acceptedTreeInputs.splice(index, 1);
         acceptedTreeMarker.setMap(null);
     });
-    acceptedTreeMarker.addListener('drag', function(event) {
+    acceptedTreeMarker.addListener("drag", function(event) {
         currLatLng = event.latLng;
         panPanos(event.latLng);
         var index = acceptedTreeMarkers.indexOf(acceptedTreeMarker);
-        
     });
-    var input = $('<input>').attr({
-        type: 'hidden',
-        name: 'trees[]',
-        id: treeNumber,
-        value: latLng.lat() + ',' + latLng.lng()
-    });
-    input.appendTo('#form');
-    acceptedTreeInputs.push(input);
 }
 
+
+/*
+ *  Saves annotated tree coordinates in (lat, lng) pairs as a CSV
+ */
+function saveTreesToCSV() {
+    allTreeCoords = [];
+    for (var marker in acceptedTreeMarkers) {
+        allTreeCoords[marker] = acceptedTreeMarkers[marker].getPosition();
+    }
+    
+    var xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.open("POST", "/savetrees");
+    xobj.setRequestHeader("Content-Type", "application/json");
+    xobj.send(JSON.stringify(allTreeCoords));
+}
+
+
+/*
+ *  Pans panorama image to "look at" given coordinates.
+ */
 function panPanos(newLatLng) {
     currLatLng = newLatLng;
-    for (var i = 0; i < panos.length; i++) {
-        var panoLatLng = new google.maps.LatLng(closestPanosData[i].lat, 
-                                                closestPanosData[i].lng);
-        var heading = google.maps.geometry.spherical.computeHeading(
-            panoLatLng, currLatLng);
-        panos[i].setPov({heading: heading,
-                         pitch: 0});
-        panoPolyLines[i].setPath([panoLatLng, currLatLng])
-    }
+    var panoLatLng = new google.maps.LatLng(closestPanosData[0].lat, 
+                                            closestPanosData[0].lng);
+    var heading = google.maps.geometry.spherical.computeHeading(
+        panoLatLng, currLatLng);
+    currPano.setPov({heading: heading,
+                     pitch: 0});
+    currPolyLine.setPath([panoLatLng, currLatLng])
 }
 
+
+/*
+ *  Returns the n nearest panos in the loaded dataset to the given coordinates.
+ */
 function getNearestPanos(lat, lng, num_panos) {
-    var dists = [], retval = [];
+    var dists = [], closestPanos = [];
     for(var i in allPanosData) {
         var panoLatLng = new google.maps.LatLng(allPanosData[i].lat, 
                                                     allPanosData[i].lng);
@@ -213,10 +232,14 @@ function getNearestPanos(lat, lng, num_panos) {
         return a.dist - b.dist;
     });
     for(var i = 0; i < dists.length && i < num_panos; i++) 
-        retval.push(dists[i].pano);
-    return retval;
+        closestPanos.push(dists[i].pano);
+    return closestPanos;
 }
 
+
+/*
+ *  Parses the URL params into JSON.
+ */
 function getJsonFromUrl() {
   var query = location.search.substr(1);
   var result = {};
@@ -226,4 +249,3 @@ function getJsonFromUrl() {
   });
   return result;
 }
-

@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
+var jsonfile = require('jsonfile');
 
 var app = express();
 app.use(express.static('public'));
@@ -15,7 +16,6 @@ app.get('/', function(request, response) {
 });
 
 app.get('/panodata/', function(req, res) {
-//    panoUrl = 'http://131.215.134.227/los_angeles/streetview/' + req.query.region + '.json';
     panoUrl = 'http://sbranson.no-ip.org/pasadena_panos/' + req.query.region + '.json';
     request({
         url: panoUrl,
@@ -29,9 +29,12 @@ app.get('/panodata/', function(req, res) {
     
 });
 
-app.post('/submittree', jsonParser, function(req, res) {
+app.post('/savetrees', jsonParser, function(req, res) {
     console.log(req.body);
-    
+    var file = 'tree_data.json';
+    jsonfile.writeFile(file, req.body, function(err) {
+        console.error(err);
+    });
 });
 
 
